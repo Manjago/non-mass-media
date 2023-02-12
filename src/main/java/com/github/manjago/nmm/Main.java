@@ -52,6 +52,10 @@ public class Main {
         final Worker worker = new Worker(
                 nextArticleIdProvider, articleUrlRetriever, telegramPoster
         );
-        worker.run(Long.parseLong(config.getProperty("worker.sleep.interval")));
+
+        final var sleepInterval = Long.parseLong(config.getProperty("worker.sleep.interval"));
+        final var maxAttempts = Integer.parseInt(config.getProperty("worker.max.attempts", "10"));
+
+        worker.run(sleepInterval, maxAttempts);
     }
 }
