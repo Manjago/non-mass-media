@@ -6,8 +6,12 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
+
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
         final var httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)

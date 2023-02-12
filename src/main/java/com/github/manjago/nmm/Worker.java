@@ -1,8 +1,11 @@
 package com.github.manjago.nmm;
 
+import java.time.Duration;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.github.manjago.nmm.ExceptionUtils.findRootCause;
 
 public class Worker {
 
@@ -26,7 +29,18 @@ public class Worker {
 
     }
 
-    public boolean run() {
+    public void run(Duration sleepInterval) {
+        try {
+             while(oneStep()) {
+                 Thread.sleep(sleepInterval.toMillis());
+             }
+        } catch (Exception e) {
+            final var exceptionMessage = "Exception happens: %s".formatted(findRootCause(e).getMessage());
+            logger.log(Level.SEVERE, exceptionMessage, e);
+        }
+    }
+
+    boolean oneStep() {
         final var nextArticleId = nextArticleIdProvider.nextArticleId();
         final var articleUrl = articleUrlRetriever.retrieveUrl(nextArticleId);
         if (articleUrl == null) {
@@ -34,13 +48,13 @@ public class Worker {
         }
 
         nextArticleIdProvider.storeArticleId(nextArticleId);
-        final var successPost = telegramPoster.postToTelegram(articleUrl);
-        if (!successPost) {
-            logger.log(Level.SEVERE, "Fail post article " + articleUrl);
-        } else {
-            logger.log(Level.INFO, "Success post article " + articleUrl);
+        try {
+            telegramPoster.postToTelegramChannel(articleUrl);
+        } catch (Exception e) {
+            final var exceptionMessage = "Fail post article %s: %s".formatted(articleUrl, findRootCause(e).getMessage());
+            logger.log(Level.SEVERE, exceptionMessage, e);
+            throw new NonMassMediaException(exceptionMessage, e);
         }
-
-        return successPost;
+        return true;
     }
 }
