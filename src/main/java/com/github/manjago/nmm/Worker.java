@@ -22,9 +22,14 @@ public class Worker {
 
     }
 
-    public void run(Long sleepInterval) {
+    public void run(Long sleepInterval, Integer maxAttempts) {
         try {
+            int counter = 0;
             while (oneStep()) {
+                ++counter;
+                if (counter >= maxAttempts) {
+                    break;
+                }
                 Thread.sleep(sleepInterval);
             }
         } catch (Exception e) {
