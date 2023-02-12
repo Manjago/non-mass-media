@@ -1,7 +1,5 @@
 package com.github.manjago.nmm;
 
-import java.time.Duration;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,11 +8,6 @@ import static com.github.manjago.nmm.ExceptionUtils.findRootCause;
 public class Worker {
 
     private final static Logger logger = Logger.getLogger(Worker.class.getName());
-
-    static {
-        logger.setLevel(Level.INFO);
-        logger.addHandler(new ConsoleHandler());
-    }
 
     private final NextArticleIdProvider nextArticleIdProvider;
     private final ArticleUrlRetriever articleUrlRetriever;
@@ -29,14 +22,15 @@ public class Worker {
 
     }
 
-    public void run(Duration sleepInterval) {
+    public void run(Long sleepInterval) {
         try {
-             while(oneStep()) {
-                 Thread.sleep(sleepInterval.toMillis());
-             }
+            while (oneStep()) {
+                Thread.sleep(sleepInterval);
+            }
         } catch (Exception e) {
             final var exceptionMessage = "Exception happens: %s".formatted(findRootCause(e).getMessage());
             logger.log(Level.SEVERE, exceptionMessage, e);
+            telegramPoster.postToAdmin(ExceptionUtils.stackTraceToString(e));
         }
     }
 
