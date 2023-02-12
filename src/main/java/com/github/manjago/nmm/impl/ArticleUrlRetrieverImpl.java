@@ -25,7 +25,7 @@ public class ArticleUrlRetrieverImpl implements ArticleUrlRetriever {
         try {
             final String pretender = "%s%d".formatted(baseUrl, articleId);
 
-            final var httpRequest = HttpRequest.newBuilder(new URI("https://xn--h1ahcp.xn--p1ai/1216"))
+            final var httpRequest = HttpRequest.newBuilder(new URI(pretender))
                     .GET()
                     .build();
 
