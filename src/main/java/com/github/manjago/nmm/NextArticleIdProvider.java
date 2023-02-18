@@ -1,6 +1,6 @@
 package com.github.manjago.nmm;
 
 public interface NextArticleIdProvider {
-    int nextArticleId();
+    int[] nextArticleIds();
     void storeArticleId(int articleId);
 }

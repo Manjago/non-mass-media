@@ -40,20 +40,25 @@ public class Worker {
     }
 
     boolean oneStep() {
-        final var nextArticleId = nextArticleIdProvider.nextArticleId();
-        final var articleUrl = articleUrlRetriever.retrieveUrl(nextArticleId);
-        if (articleUrl == null) {
-            return false;
+        final int[] nextArticleIds = nextArticleIdProvider.nextArticleIds();
+
+        for (final int nextArticleId : nextArticleIds) {
+            final var articleUrl = articleUrlRetriever.retrieveUrl(nextArticleId);
+            if (articleUrl == null) {
+                continue;
+            }
+
+            nextArticleIdProvider.storeArticleId(nextArticleId);
+            try {
+                telegramPoster.postToTelegramChannel(articleUrl);
+            } catch (Exception e) {
+                final var exceptionMessage = "Fail post article %s: %s".formatted(articleUrl, findRootCause(e).getMessage());
+                logger.log(Level.SEVERE, exceptionMessage, e);
+                throw new NonMassMediaException(exceptionMessage, e);
+            }
+            return true;
         }
 
-        nextArticleIdProvider.storeArticleId(nextArticleId);
-        try {
-            telegramPoster.postToTelegramChannel(articleUrl);
-        } catch (Exception e) {
-            final var exceptionMessage = "Fail post article %s: %s".formatted(articleUrl, findRootCause(e).getMessage());
-            logger.log(Level.SEVERE, exceptionMessage, e);
-            throw new NonMassMediaException(exceptionMessage, e);
-        }
-        return true;
+        return false;
     }
 }

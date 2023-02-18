@@ -40,6 +40,7 @@ public class Main {
                 httpClient);
 
         final NextArticleIdProvider nextArticleIdProvider = new NextArticleIdProviderImpl(
+                Integer.parseInt(config.getProperty("next.article.id.provider.data.depth", "5")),
                 config.getProperty("next.article.id.provider.data.file")
         );
 
