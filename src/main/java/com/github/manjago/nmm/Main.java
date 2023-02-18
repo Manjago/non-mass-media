@@ -22,7 +22,7 @@ public class Main {
             logger.severe("Need properties file in argument");
             return;
         }
-        logger.info("Loading properties from %s".formatted(args[0]));
+        logger.fine("Loading properties from %s".formatted(args[0]));
 
         final var config = new Properties();
         try (final var is = new FileInputStream(args[0])) {
